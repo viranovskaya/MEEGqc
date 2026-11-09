@@ -8,6 +8,7 @@ pytestmark = pytest.mark.realdata
 
 
 @pytest.mark.parametrize("analysis_mode", ["non-profile", "new-profile"])
+@pytest.mark.parametrize("n_jobs", [1, 2])
 def test_literal_output_calculation_and_plotting(
     one_meg,
     isolated_dataset,
@@ -15,6 +16,7 @@ def test_literal_output_calculation_and_plotting(
     cli,
     tmp_path,
     analysis_mode,
+    n_jobs,
 ):
     dataset = isolated_dataset(one_meg[1])
     output = tmp_path / "quality-control"
@@ -34,7 +36,10 @@ def test_literal_output_calculation_and_plotting(
         root = root / "profiles" / "literal-test"
 
     calculation = cli(
-        ["run-meegqc", *common, "--config", str(fast_config), "--n_jobs", "1"]
+        [
+            "run-meegqc", *common, "--config", str(fast_config),
+            "--n_jobs", str(n_jobs), "--mem-reserve-gb", "0",
+        ]
     )
     assert calculation.returncode == 0, (calculation.stdout + calculation.stderr)[-3000:]
 
